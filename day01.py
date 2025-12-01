@@ -2,25 +2,28 @@ def day01(inp):
     dat = inp.splitlines()
     
     pos = 50
-    part1 = 0
+    part1 = part2 = 0
     for line in dat:
         dir, count = line[0], int(line[1:])
         sign = 1 if dir == 'R' else -1
-        pos += sign*count
+        delta = sign * count
+
+        # part 2: number of full rotations + potential partial rotation
+        delta_div, delta_rem = divmod(abs(delta), 100)
+        part2 += delta_div
+        zero_hit_from_partial = (
+            (sign < 0 and delta_rem >= pos) or
+            (sign > 0 and delta_rem >= 100 - pos)
+        )
+        # starting from pos=0 would be a false positive here
+        if pos and zero_hit_from_partial:
+            part2 += 1
+
+        # part 1: only final state matters
+        pos += delta
         pos %= 100
         if pos == 0:
             part1 += 1
-
-    pos = 50
-    part2 = 0
-    for line in dat:
-        dir, count = line[0], int(line[1:])
-        sign = 1 if dir == 'R' else -1
-        for _ in range(count):
-            pos += sign
-            pos %= 100
-            if pos == 0:
-                part2 += 1
 
     return part1, part2
 
